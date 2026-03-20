@@ -1,0 +1,556 @@
+/* ---- Brand (not Google-like) ---- */
+:root {
+  --brand: #7c5cff;
+  --brand2: #ff4d6d;
+  --soft: rgba(124, 92, 255, 0.14);
+  --stroke: rgba(255, 255, 255, 0.12);
+}
+
+/* Light theme adjustments */
+html[data-bs-theme="light"] {
+  --stroke: rgba(0, 0, 0, 0.1);
+  --soft: rgba(124, 92, 255, 0.1);
+}
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(
+      900px 600px at 20% 0%,
+      rgba(124, 92, 255, 0.25),
+      transparent 60%
+    ),
+    radial-gradient(
+      900px 600px at 80% 10%,
+      rgba(255, 77, 109, 0.12),
+      transparent 60%
+    );
+}
+
+/* Full app height */
+.app-shell {
+  min-height: 100vh;
+}
+
+.right-icon,
+.wrong-icon {
+  color: transparent;
+}
+
+/* Layout as flex row */
+.app-layout {
+  min-height: 100vh;
+  display: flex;
+}
+/* Locks page scroll ONLY when FormBuilder mounts */
+.no-page-scroll {
+  overflow: hidden;
+  height: 100vh;
+}
+
+/* Sidebar on desktop: fixed width */
+@media (min-width: 992px) {
+  .sidebar-wrapper {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    width: 280px; /* ✅ keep stable width */
+    transform: none;
+    transition: none;
+    background: transparent;
+  }
+}
+
+/* Main takes remaining width + full height */
+.app-main {
+  flex: 1;
+  min-width: 0; /* ✅ prevents overflow pushing layout */
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* 1) Builder host must allow children to overflow/scroll */
+.builder-host {
+  flex: 1;
+  min-height: 0; /* already in your css ✅ */
+}
+
+/* 2) Make the builder-area take full available height */
+.builder-area {
+  flex: 1;
+  min-height: 0; /* already ✅ */
+  height: 100%; /* add this ✅ */
+}
+/* 4) Panel becomes a flex column with fixed height */
+.builder-panel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* 5) Only the body part scrolls */
+.builder-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0; /* MOST IMPORTANT */
+}
+
+/* Optional: smoother scroll */
+.builder-scroll {
+  scroll-behavior: smooth;
+}
+/* 3) Each section (col) must be able to shrink for scroll */
+.builder-area > section {
+  min-height: 0; /* already ✅ */
+  height: 100%; /* add this ✅ */
+}
+
+.panel {
+  min-height: 0;
+}
+
+.sidebar {
+  border-right: 1px solid var(--stroke);
+  backdrop-filter: blur(10px);
+  height: 100%;
+}
+.brand-badge {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(135deg, var(--brand), var(--brand2));
+}
+.nav-pills .nav-link {
+  border: 1px solid transparent;
+  border-radius: 14px;
+  color: var(--bs-secondary-color);
+}
+.nav-pills .nav-link:hover {
+  border-color: var(--stroke);
+  background: color-mix(in oklab, var(--bs-body-bg) 70%, var(--brand) 30%);
+  color: var(--bs-body-color);
+}
+.nav-pills .nav-link.active {
+  background: color-mix(in oklab, var(--bs-body-bg) 70%, var(--brand) 30%);
+  border-color: color-mix(in oklab, var(--brand) 60%, transparent 40%);
+  color: var(--bs-body-color);
+}
+
+/* Panels */
+.panel {
+  border: 1px solid var(--stroke);
+  border-radius: 18px;
+  background: color-mix(in oklab, var(--bs-body-bg) 92%, transparent 8%);
+  overflow: hidden;
+}
+.panel-head {
+  border-bottom: 1px solid var(--stroke);
+  background: color-mix(in oklab, var(--bs-body-bg) 86%, transparent 14%);
+}
+.tool-btn {
+  border: 1px solid var(--stroke);
+  border-radius: 14px;
+  background: color-mix(in oklab, var(--bs-body-bg) 90%, transparent 10%);
+  text-align: left;
+  padding: 10px 12px;
+  width: 100%;
+}
+.tool-btn:hover {
+  border-color: color-mix(in oklab, var(--brand) 50%, var(--stroke) 50%);
+  background: var(--soft);
+}
+
+/* Canvas field cards */
+.field-card {
+  border: 1px solid var(--stroke);
+  border-radius: 18px;
+  background: color-mix(in oklab, var(--bs-body-bg) 88%, transparent 12%);
+}
+.field-card.selected {
+  border-color: color-mix(in oklab, var(--brand) 60%, var(--stroke) 40%);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--brand) 22%, transparent 78%);
+}
+
+.chip {
+  border: 1px solid color-mix(in oklab, #22c55e 40%, var(--stroke) 60%);
+  background: color-mix(in oklab, #22c55e 18%, transparent 82%);
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+/* Make builder area tall */
+/* .builder-area {
+  height: calc(100vh - 86px);
+} */
+@media (max-width: 992px) {
+  .builder-area {
+    height: auto;
+  }
+}
+
+/* “Add field” button */
+.add-field {
+  border: 1px dashed var(--stroke);
+  border-radius: 18px;
+  background: color-mix(in oklab, var(--bs-body-bg) 92%, transparent 8%);
+}
+.add-field:hover {
+  border-color: color-mix(in oklab, var(--brand) 60%, var(--stroke) 40%);
+  background: var(--soft);
+}
+/* ===== Mobile Sidebar Drawer ===== */
+.sidebar-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh; /* full height */
+  width: 280px; /* drawer width */
+  z-index: 1050;
+  transform: translateX(-100%); /* hidden to left */
+  transition: transform 0.3s ease;
+  background: color-mix(in oklab, var(--bs-body-bg) 92%, transparent 8%);
+  border-right: 1px solid var(--stroke);
+  backdrop-filter: blur(10px);
+  overflow-y: auto;
+}
+
+.sidebar-wrapper.open {
+  transform: translateX(0); /* slide from left */
+}
+
+/* Optional overlay behind sidebar */
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 1049;
+}
+
+/* Desktop: sidebar behaves normal (no drawer) */
+@media (min-width: 992px) {
+  .sidebar-wrapper {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    width: auto;
+    transform: none;
+    transition: none;
+
+    border-right: 1px solid var(--stroke);
+  }
+
+  .sidebar-backdrop {
+    display: none;
+  }
+}
+/* IMPORTANT: prevents flex + overflow auto from "jumping" after delete */
+.builder-area > section {
+  min-height: 0;
+}
+.panel {
+  min-height: 0;
+}
+.canvas-scroll {
+  min-height: 0;
+}
+
+/* make the selected field feel clickable without changing look */
+.field-card[role="button"] {
+  cursor: pointer;
+}
+.field-card:focus {
+  outline: none;
+}
+
+/* optional: prevent input width issues inside cards */
+.field-card .form-control {
+  width: 100%;
+}
+
+/* If you see “sticky” property panel background mismatch on dark */
+@media (min-width: 1200px) {
+  .properties-col .panel-head {
+    background: color-mix(in oklab, var(--bs-body-bg) 86%, transparent 14%);
+  }
+}
+
+/* form report */
+
+.brand-badge {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(135deg, var(--brand), var(--brand2));
+}
+.nav-pills .nav-link {
+  border: 1px solid transparent;
+  border-radius: 14px;
+  color: var(--bs-secondary-color);
+}
+.nav-pills .nav-link:hover {
+  border-color: var(--stroke);
+  background: color-mix(in oklab, var(--bs-body-bg) 70%, var(--brand) 30%);
+  color: var(--bs-body-color);
+}
+.nav-pills .nav-link.active {
+  background: color-mix(in oklab, var(--bs-body-bg) 70%, var(--brand) 30%);
+  border-color: color-mix(in oklab, var(--brand) 60%, transparent 40%);
+  color: var(--bs-body-color);
+}
+.panel {
+  border: 1px solid var(--stroke);
+  border-radius: 18px;
+  background: color-mix(in oklab, var(--bs-body-bg) 92%, transparent 8%);
+  overflow: hidden;
+}
+.panel-head {
+  border-bottom: 1px solid var(--stroke);
+  background: color-mix(in oklab, var(--bs-body-bg) 86%, transparent 14%);
+}
+.badge-soft {
+  border: 1px solid var(--stroke);
+  background: color-mix(in oklab, var(--bs-body-bg) 86%, transparent 14%);
+  color: var(--bs-body-color);
+}
+.btn-brand {
+  background: var(--brand);
+  border-color: var(--brand);
+}
+.btn-brand:hover {
+  background: color-mix(in oklab, var(--brand) 86%, black 14%);
+  border-color: color-mix(in oklab, var(--brand) 86%, black 14%);
+}
+.table thead th {
+  border-bottom: 1px solid var(--stroke) !important;
+  color: var(--bs-secondary-color);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+}
+.table td,
+.table th {
+  border-color: var(--stroke) !important;
+}
+.search {
+  border: 1px solid var(--stroke);
+  border-radius: 14px;
+  background: color-mix(in oklab, var(--bs-body-bg) 92%, transparent 8%);
+}
+
+/* ✅ Improved pagination to match your theme */
+.pagination-soft .page-link {
+  border: 1px solid var(--stroke);
+  background: color-mix(in oklab, var(--bs-body-bg) 92%, transparent 8%);
+  color: var(--bs-body-color);
+  border-radius: 14px;
+  margin-left: 8px;
+}
+.pagination-soft .page-item:first-child .page-link {
+  margin-left: 0;
+}
+.pagination-soft .page-item.active .page-link {
+  background: color-mix(in oklab, var(--bs-body-bg) 70%, var(--brand) 30%);
+  border-color: color-mix(in oklab, var(--brand) 60%, transparent 40%);
+}
+.pagination-soft .page-item.disabled .page-link {
+  opacity: 0.5;
+}
+
+/* preview mode */
+
+/* Compact shell */
+.shell {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 14px 12px 34px;
+}
+
+/* Compact topbar */
+.topbar {
+  border: 1px solid var(--stroke);
+  border-radius: 16px;
+  background: var(--card);
+  backdrop-filter: blur(10px);
+  padding: 10px 12px !important;
+}
+.brand-badge {
+  width: 36px;
+  height: 36px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  color: #fff;
+  background: linear-gradient(135deg, var(--brand), var(--brand2));
+  box-shadow: 0 8px 20px rgba(124, 92, 255, 0.2);
+  font-size: 13px;
+}
+
+/* Compact chips */
+.help-chip {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--stroke);
+  background: color-mix(in oklab, var(--bs-body-bg) 86%, transparent 14%);
+  font-size: 11px;
+  color: var(--bs-secondary-color);
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+/* Compact hero */
+.hero {
+  border: 1px solid var(--stroke);
+  border-radius: 18px;
+  background: linear-gradient(
+    135deg,
+    color-mix(in oklab, var(--soft) 75%, transparent 25%),
+    color-mix(in oklab, rgba(255, 77, 109, 0.1) 60%, transparent 40%)
+  );
+  overflow: hidden;
+  position: relative;
+  padding: 14px 14px !important;
+}
+.hero:after {
+  content: "";
+  position: absolute;
+  inset: -60px -60px auto auto;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 30% 30%,
+    rgba(255, 77, 109, 0.26),
+    transparent 55%
+  );
+  filter: blur(2px);
+  pointer-events: none;
+}
+
+/* Compact card */
+.form-card {
+  border: 1px solid var(--stroke);
+  border-radius: 18px;
+  background: var(--card);
+  overflow: hidden;
+}
+.form-card .card-header {
+  border-bottom: 1px solid var(--stroke);
+  background: color-mix(in oklab, var(--bs-body-bg) 86%, transparent 14%);
+  padding: 12px 14px !important;
+}
+.form-card .card-body {
+  padding: 14px !important;
+}
+
+/* Compact form controls */
+.form-label {
+  margin-bottom: 0.35rem;
+  font-size: 0.92rem;
+}
+.form-control,
+.form-select {
+  border-radius: 12px;
+  border-color: var(--stroke);
+  background: color-mix(in oklab, var(--bs-body-bg) 92%, transparent 8%);
+  padding-top: 0.45rem;
+  padding-bottom: 0.45rem;
+}
+.form-control:focus,
+.form-select:focus {
+  border-color: color-mix(in oklab, var(--brand) 70%, var(--stroke) 30%);
+  box-shadow: 0 0 0 0.2rem
+    color-mix(in oklab, var(--brand) 18%, transparent 82%);
+}
+textarea.form-control {
+  min-height: 96px;
+}
+
+.req {
+  font-weight: 800;
+  color: var(--bs-danger);
+}
+
+/* Buttons */
+.btn-brand {
+  background: var(--brand);
+  border-color: var(--brand);
+  border-radius: 12px;
+}
+.btn-brand:hover {
+  background: color-mix(in oklab, var(--brand) 86%, black 14%);
+  border-color: color-mix(in oklab, var(--brand) 86%, black 14%);
+}
+
+/* Compact footer note */
+.footer-note {
+  color: var(--bs-secondary-color);
+  font-size: 12px;
+}
+
+/* Reduce vertical gaps */
+.g-3 {
+  --bs-gutter-y: 0.75rem;
+}
+/* Dashboard cards */
+.stat-card {
+  border: 1px solid var(--stroke);
+  border-radius: 18px;
+  background: color-mix(in oklab, var(--bs-body-bg) 92%, transparent 8%);
+  padding: 16px;
+  height: 100%;
+}
+.stat-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--stroke);
+  background: color-mix(in oklab, var(--bs-body-bg) 86%, transparent 14%);
+}
+.stat-value {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  line-height: 1.1;
+}
+.mini-note {
+  font-size: 12px;
+  color: var(--bs-secondary-color);
+}
+
+.table thead th {
+  border-bottom: 1px solid var(--stroke) !important;
+  color: var(--bs-secondary-color);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+}
+.table td,
+.table th {
+  border-color: var(--stroke) !important;
+}
+
+.font700 {
+  font-weight: 700;
+}

@@ -1,0 +1,249 @@
+/* ===================== ROOT ===================== */
+:root {
+  --up-bg: #f6f7fb;
+  --up-card: #ffffff;
+  --up-text: #0f172a;
+  --up-muted: #6b7280;
+  --up-border: #e5e7eb;
+  --up-soft: #f8fafc;
+  --up-brand: #2563eb;
+}
+
+/* ===================== PAGE ===================== */
+.up-page {
+  background: var(--up-bg);
+  min-height: 100vh;
+  flex: 1 1 auto;
+}
+
+.container-fluid.app-shell {
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+/* ===================== TYPOGRAPHY ===================== */
+.up-title {
+  font-weight: 800;
+  color: var(--up-text);
+  margin: 0;
+}
+
+.up-subtitle {
+  color: var(--up-muted);
+}
+
+/* ===================== CARDS ===================== */
+.up-card {
+  background: var(--up-card);
+  border: 1px solid var(--up-border);
+  border-radius: 12px;
+}
+
+.up-card-header {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--up-border);
+  background: #fff;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+.up-card-body {
+  padding: 14px;
+}
+
+/* ===================== SEARCH ===================== */
+.up-search .form-control,
+.up-search .input-group-text {
+  border-color: var(--up-border) !important;
+}
+
+/* ===================== ROLE LIST ===================== */
+.up-role-list {
+  max-height: 580px;
+  overflow: auto;
+}
+
+.up-role-item {
+  border: 0 !important;
+  border-bottom: 1px solid var(--up-border) !important;
+  padding: 12px !important;
+  text-align: left;
+}
+
+.up-role-item.active {
+  background: var(--up-soft) !important;
+  color: var(--up-text) !important;
+}
+
+/* ===================== ACTION BUTTONS ===================== */
+.up-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.up-btn {
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+}
+
+.up-btn-primary {
+  background: var(--up-brand) !important;
+  border-color: var(--up-brand) !important;
+}
+
+/* ===================== MODULE GROUP ===================== */
+.up-group {
+  border: 1px solid var(--up-border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 12px;
+  background: #fff;
+}
+
+.up-group-head {
+  padding: 10px 12px;
+  background: var(--up-soft);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.up-group-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+  color: var(--up-text);
+}
+
+.up-group-title i {
+  font-size: 18px;
+  color: #334155;
+}
+
+/* ===================== PERMISSION TABLE ===================== */
+.up-row {
+  display: grid;
+  grid-template-columns: 1fr 120px 280px; /* Page | Enabled | CRUD */
+  align-items: center;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--up-border);
+  gap: 10px;
+}
+
+.up-row:last-child {
+  border-bottom: 0;
+}
+
+/* ---------- HEADER ROW ---------- */
+.up-row-head {
+  background: var(--up-soft);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  border-top: 1px solid var(--up-border);
+  border-bottom: 1px solid var(--up-border);
+}
+
+.up-row-title {
+  font-size: 12px;
+  font-weight: 800;
+  color: #334155;
+  text-transform: uppercase;
+  letter-spacing: 0.25px;
+}
+
+/* ===================== PAGE CELL ===================== */
+.up-pagecell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.up-pagecell .name {
+  font-weight: 700;
+  color: var(--up-text);
+  line-height: 1.15;
+}
+
+.up-pagecell .route {
+  font-size: 12px;
+  color: var(--up-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* indentation */
+.up-indent {
+  width: var(--indent, 0px);
+  flex: 0 0 auto;
+}
+
+/* ===================== ENABLE COLUMN ===================== */
+.up-enable {
+  display: flex;
+  justify-content: center;
+}
+
+/* ===================== CRUD COLUMN ===================== */
+.up-crud {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  justify-items: center;
+  align-items: center;
+}
+
+/* header alignment */
+.up-crud-head {
+  justify-items: center;
+}
+
+/* checkbox styling */
+.up-check .form-check-input {
+  margin: 0 !important;
+  float: none !important;
+}
+
+.up-crud .form-check {
+  margin: 0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* REMOVE old C / V / E / D pills */
+.up-pill {
+  display: none !important;
+}
+
+/* ===================== SCROLL ===================== */
+.up-scroll {
+  max-height: 600px;
+  overflow: auto;
+}
+
+/* ===================== RESPONSIVE ===================== */
+@media (max-width: 992px) {
+  .up-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .up-enable {
+    justify-content: flex-start;
+  }
+
+  .up-crud {
+    grid-template-columns: repeat(4, minmax(44px, 1fr));
+    justify-items: start;
+  }
+}
+.active .text-secondary {
+  color: white !important;
+}
