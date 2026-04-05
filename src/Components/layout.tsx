@@ -19,6 +19,9 @@ import OrganizationDashboard from "../Organization/OrganizationDashboard";
 import AddAdmin from "../Admin/AddAdmin";
 import MyFormDetails from "../formbuilder/myFormDetail";
 import ConsentWithdrawRequest from "../formbuilder/consentWithdrawReport";
+import PrivacyNoticePage from "../Admin/PrivacyNoticePage";
+
+
 
 const Layout: React.FC = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -111,6 +114,16 @@ const Layout: React.FC = () => {
                                 element={
                                     <ProtectedRoute type="admin">
                                         <AddAdmin />
+                                    </ProtectedRoute>
+                                }
+                            />
+
+                             {/*  NEW ROUTE ADDED HERE */}
+                            <Route
+                                path="/admin/privacyNotices"
+                                element={
+                                    <ProtectedRoute type="admin">
+                                        <PrivacyNoticePage />
                                     </ProtectedRoute>
                                 }
                             />

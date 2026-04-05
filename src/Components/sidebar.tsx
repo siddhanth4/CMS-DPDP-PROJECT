@@ -137,18 +137,48 @@ const Sidebar: React.FC<Props> = ({ onClose, onNav }) => {
                                 Loading menu...
                             </div>
                         ) : (
-                            visibleAdminMenus.map((m) => (
+                           <>
+                                {/* 🔥 Dynamic Menus */}
+                                {visibleAdminMenus.length > 0 ? (
+                                    visibleAdminMenus.map((m) => (
+                                        <NavLink
+                                            key={m.Id}
+                                            to={m.Route}
+                                            className={({ isActive }) =>
+                                                `nav-link ${
+                                                    isActive ? "active" : ""
+                                                }`
+                                            }
+                                            onClick={onNav}
+                                            id={m.PageKey}
+                                        >
+                                            <i
+                                                className={`bi ${menuIconClass(
+                                                    m.Icon
+                                                )} me-2`}
+                                            />
+                                            {m.PageName}
+                                        </NavLink>
+                                    ))
+                                ) : (
+                                    <div className="text-secondary small px-2">
+                                        No menu available
+                                    </div>
+                                )}
+
+                                {/* 🔥 ALWAYS VISIBLE MANUAL MENU */}
                                 <NavLink
-                                    key={m.Id}
-                                    to={m.Route}
-                                    className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}
+                                    to="/admin/privacyNotices"
+                                    className={({ isActive }) =>
+                                        `nav-link ${isActive ? "active" : ""}`
+                                    }
                                     onClick={onNav}
-                                    id={m.PageKey}
                                 >
-                                    <i className={`bi ${menuIconClass(m.Icon)} me-2`} />
-                                    {m.PageName}
+                                    <i className="bi bi-file-earmark-lock2 me-2" />
+                                    Privacy Notices
                                 </NavLink>
-                            ))
+                            </>
+                            
                         )}
 
                         <button
