@@ -1,0 +1,33 @@
+# Node
+node_modules/
+dist/
+build/
+
+# Env
+.env
+.env.local
+
+# Logs
+logs/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# VS / .NET
+.vs/
+bin/
+obj/
+
+# SQL backups
+*.bak
+*.zip
+
+# Expo / RN
+.expo/
+android/
+ios/
+
+# Cache
+.cache/

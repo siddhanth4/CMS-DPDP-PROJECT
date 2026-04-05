@@ -1,0 +1,162 @@
+:root {
+  --brand: #7c5cff;
+  --brand2: #ff4d6d;
+  --stroke: rgba(255, 255, 255, 0.12);
+  --soft: rgba(124, 92, 255, 0.14);
+  --card: color-mix(in oklab, var(--bs-body-bg) 92%, transparent 8%);
+}
+html[data-bs-theme="light"] {
+  --stroke: rgba(0, 0, 0, 0.1);
+  --soft: rgba(124, 92, 255, 0.1);
+  --card: color-mix(in oklab, var(--bs-body-bg) 96%, transparent 4%);
+}
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(
+      1100px 650px at 10% 0%,
+      rgba(124, 92, 255, 0.25),
+      transparent 60%
+    ),
+    radial-gradient(
+      900px 600px at 90% 10%,
+      rgba(255, 77, 109, 0.14),
+      transparent 60%
+    ),
+    radial-gradient(
+      900px 600px at 50% 100%,
+      rgba(34, 197, 94, 0.1),
+      transparent 55%
+    );
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.wrap {
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 26px 14px 60px;
+}
+
+.glass {
+  border: 1px solid var(--stroke);
+  background: var(--card);
+  border-radius: 24px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+}
+
+.side {
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    color-mix(in oklab, var(--soft) 70%, transparent 30%),
+    color-mix(in oklab, rgba(255, 77, 109, 0.14) 55%, transparent 45%)
+  );
+  border-right: 1px solid var(--stroke);
+  min-height: 100%;
+}
+.side:before {
+  content: "";
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  left: -80px;
+  top: -80px;
+  background: radial-gradient(
+    circle at 40% 40%,
+    rgba(124, 92, 255, 0.35),
+    transparent 60%
+  );
+  border-radius: 50%;
+  filter: blur(2px);
+}
+.side:after {
+  content: "";
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  right: -100px;
+  bottom: -90px;
+  background: radial-gradient(
+    circle at 40% 40%,
+    rgba(255, 77, 109, 0.28),
+    transparent 60%
+  );
+  border-radius: 50%;
+  filter: blur(2px);
+}
+
+.brand {
+  width: 46px;
+  height: 46px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  color: #fff;
+  background: linear-gradient(135deg, var(--brand), var(--brand2));
+  box-shadow: 0 12px 32px rgba(124, 92, 255, 0.28);
+  flex: 0 0 auto;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--stroke);
+  background: color-mix(in oklab, var(--bs-body-bg) 85%, transparent 15%);
+  font-size: 12px;
+  color: var(--bs-secondary-color);
+  position: relative;
+  z-index: 1;
+}
+
+.form-control,
+.form-select {
+  border-radius: 14px;
+  border-color: var(--stroke);
+  background: color-mix(in oklab, var(--bs-body-bg) 92%, transparent 8%);
+}
+.form-control:focus,
+.form-select:focus {
+  border-color: color-mix(in oklab, var(--brand) 70%, var(--stroke) 30%);
+  box-shadow: 0 0 0 0.2rem
+    color-mix(in oklab, var(--brand) 20%, transparent 80%);
+}
+
+.btn-brand {
+  background: var(--brand);
+  border-color: var(--brand);
+  border-radius: 14px;
+}
+.btn-brand:hover {
+  background: color-mix(in oklab, var(--brand) 86%, black 14%);
+  border-color: color-mix(in oklab, var(--brand) 86%, black 14%);
+}
+
+.req {
+  color: var(--bs-danger);
+  font-weight: 800;
+}
+.mini-note {
+  font-size: 12px;
+  color: var(--bs-secondary-color);
+}
+.divider {
+  height: 1px;
+  background: var(--stroke);
+  margin: 16px 0;
+}
+
+/* Small “show password” button look */
+.icon-btn {
+  border-radius: 0 14px 14px 0;
+  border-color: var(--stroke);
+}
