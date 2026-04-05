@@ -1,4 +1,20 @@
 import React, { useState } from "react";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import dayjs from "dayjs";
+
+
+const calculateMonths = (from: string, to: string) => {
+    if (!from || !to) return "";
+
+    const start = dayjs(from);
+    const end = dayjs(to);
+
+    const months = end.diff(start, "month");
+
+    return months >= 0 ? `${months} month(s)` : "";
+};
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -33,6 +49,47 @@ interface PrivacyNoticeForm {
     language: string;
     sections: NoticeSection[];
 }
+
+const PURPOSE_OPTIONS = [
+    "Service Provision & Account Management (Provide services, create/manage accounts, process requests)",
+    "Communication & Customer Support (Send updates, notifications, and handle user queries)",
+    "Analytics & Service Improvement (Analyze usage, improve features, optimize performance)",
+    "Personalization (Customize content, recommendations, and user experience)",
+    "AI/ML Training & Research (Train models, develop new features, innovation)",
+    "Marketing & Promotional Activities (Send offers, advertisements, product updates)",
+    "Security, Fraud Prevention & Legal Compliance (Protect platform, detect fraud, comply with laws, enforce policies)",
+];
+
+const DATA_CATEGORIES_OPTIONS = [
+    "Identity Information (Name, username, gender, date of birth)",
+    "Contact Information (Email, mobile number, address)",
+    "Government Identification Details (Aadhaar, PAN, passport, driving license)",
+    "Financial & Payment Information (Bank details, UPI ID, transactions, billing info)",
+    "Technical & Device Information (IP address, device type, browser, system logs)",
+    "Usage & Behavioral Data (Activity, preferences, interaction patterns)",
+    "User-Provided Content & Documents (Form inputs, uploaded files, feedback, messages)",
+    "Professional / Educational Information (Job details, company, education, resume)",
+    "Communication Data (Emails, chats, support tickets, call records)",
+    "Third-Party / Integrated Data (Social media data, partner-provided data)",
+    "Sensitive Personal Data (Biometric, health, financial credentials, other sensitive info)",
+];
+
+const LEGAL_BASIS_OPTIONS = [
+    "Consent of the Data Principal",
+    "Compliance with legal obligations",
+    "Performance of a contract",
+    "Legitimate uses (as per DPDP Act)",
+    "Prevention of fraud / security purposes",
+];
+
+const DATA_SUBJECT_RIGHTS_OPTIONS = [
+    "Right to Access Information",
+    "Right to Correction & Update",
+    "Right to Erasure (Deletion)",
+    "Right to Withdraw Consent",
+    "Right to Grievance Redressal",
+    "Right to Nominate",
+];
 
 const DEFAULT_SECTIONS: NoticeSection[] = [
     {
@@ -344,7 +401,22 @@ const PreviewModal: React.FC<{
                                         whiteSpace: "pre-wrap",
                                     }}
                                 >
-                                    {sec.content || (
+                                    {sec.content ? (
+                                        sec.key === "retentionPeriod" ? (
+                                            <>
+                                                <div><strong>From:</strong> {sec.content.split("|")[0]}</div>
+                                                <div><strong>To:</strong> {sec.content.split("|")[1]}</div>
+                                                <div><strong>Duration:</strong> {sec.content.split("|")[2]}</div>
+                                            </>
+                                        ) : sec.key === "contactDPO" || sec.key === "grievanceOfficer" ? (
+                                            <>
+                                                <div><strong>Name:</strong> {sec.content.split("|")[0] || "—"}</div>
+                                                <div><strong>Email:</strong> {sec.content.split("|")[1] || "—"}</div>
+                                            </>
+                                        ) : (
+                                            sec.content
+                                        )
+                                    ) : (
                                         <span className="fst-italic">
                                             [No content entered for this section]
                                         </span>
@@ -481,12 +553,23 @@ const PrivacyNoticeBuilder: React.FC = () => {
                 <label className="form-label small fw-semibold">
                     Effective Date <span className="text-danger">*</span>
                 </label>
-                <input
-                    type="date"
-                    className="form-control"
-                    value={form.effectiveDate}
-                    onChange={(e) => updateMeta("effectiveDate", e.target.value)}
-                />
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DatePicker
+                        value={form.effectiveDate ? dayjs(form.effectiveDate) : null}
+                        onChange={(newValue) =>
+                            updateMeta(
+                                "effectiveDate",
+                                newValue ? newValue.format("YYYY-MM-DD") : ""
+                            )
+                        }
+                        slotProps={{
+                            textField: {
+                                className: "form-control",
+                                size: "small",
+                            },
+                        }}
+                    />
+                </LocalizationProvider>
             </div>
 
             <div className="col-md-4">
@@ -545,7 +628,7 @@ const PrivacyNoticeBuilder: React.FC = () => {
                 <div
                     className="col-12 col-md-4"
                     style={{
-                        borderRight: "1px solid rgba(255,255,255,0.07)",
+                        borderRight: "1px solid rgba(255, 255, 255, 0)",
                         paddingRight: 0,
                     }}
                 >
@@ -722,17 +805,236 @@ const PrivacyNoticeBuilder: React.FC = () => {
                                 <strong>Guidance:</strong> {active.placeholder}
                             </div>
 
-                            <textarea
-                                className="form-control"
-                                rows={10}
-                                style={{ resize: "vertical", fontSize: 14, lineHeight: 1.7 }}
-                                placeholder="Write the notice content for this section..."
-                                value={active.content}
-                                onChange={(e) =>
-                                    updateSection(active.key, { content: e.target.value })
-                                }
-                            />
+                            {active.key === "purposeOfProcessing" ? (
+                                <div>
+                                    {PURPOSE_OPTIONS.map((purpose, index) => {
+                                        const selected = active.content.split("\n").includes(purpose);
 
+                                        return (
+                                            <div key={index} className="form-check mb-2">
+                                                <input
+                                                    className="form-check-input"
+                                                    type="checkbox"
+                                                    id={`purpose-${index}`}
+                                                    checked={selected}
+                                                    onChange={(e) => {
+                                                        let updated = active.content
+                                                            ? active.content.split("\n")
+                                                            : [];
+
+                                                        if (e.target.checked) updated.push(purpose);
+                                                        else updated = updated.filter((p) => p !== purpose);
+
+                                                        updateSection(active.key, {
+                                                            content: updated.join("\n"),
+                                                        });
+                                                    }}
+                                                />
+                                                <label className="form-check-label">{purpose}</label>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+
+                            ) : active.key === "dataCategories" ? (
+                                <div>
+                                    {DATA_CATEGORIES_OPTIONS.map((category, index) => {
+                                        const selected = active.content.split("\n").includes(category);
+
+                                        return (
+                                            <div key={index} className="form-check mb-2">
+                                                <input
+                                                    type="checkbox"
+                                                    className="form-check-input"
+                                                    checked={selected}
+                                                    onChange={(e) => {
+                                                        let updated = active.content
+                                                            ? active.content.split("\n")
+                                                            : [];
+
+                                                        if (e.target.checked) updated.push(category);
+                                                        else updated = updated.filter((c) => c !== category);
+
+                                                        updateSection(active.key, {
+                                                            content: updated.join("\n"),
+                                                        });
+                                                    }}
+                                                />
+                                                <label className="form-check-label">{category}</label>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+
+                            ) : active.key === "legalBasis" ? (
+                                <div>
+                                    {LEGAL_BASIS_OPTIONS.map((basis, index) => {
+                                        const selected = active.content.split("\n").includes(basis);
+
+                                        return (
+                                            <div key={index} className="form-check mb-2">
+                                                <input
+                                                    type="checkbox"
+                                                    className="form-check-input"
+                                                    checked={selected}
+                                                    onChange={(e) => {
+                                                        let updated = active.content
+                                                            ? active.content.split("\n")
+                                                            : [];
+
+                                                        if (e.target.checked) updated.push(basis);
+                                                        else updated = updated.filter((b) => b !== basis);
+
+                                                        updateSection(active.key, {
+                                                            content: updated.join("\n"),
+                                                        });
+                                                    }}
+                                                />
+                                                <label className="form-check-label">{basis}</label>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+
+                            ) : active.key === "dataSubjectRights" ? (
+                                <div>
+                                    {DATA_SUBJECT_RIGHTS_OPTIONS.map((right, index) => {
+                                        const selected = active.content.split("\n").includes(right);
+
+                                        return (
+                                            <div key={index} className="form-check mb-2">
+                                                <input
+                                                    type="checkbox"
+                                                    className="form-check-input"
+                                                    id={`rights-${index}`}
+                                                    checked={selected}
+                                                    onChange={(e) => {
+                                                        let updated = active.content
+                                                            ? active.content.split("\n")
+                                                            : [];
+
+                                                        if (e.target.checked) updated.push(right);
+                                                        else updated = updated.filter((r) => r !== right);
+
+                                                        updateSection(active.key, {
+                                                            content: updated.join("\n"),
+                                                        });
+                                                    }}
+                                                />
+                                                <label className="form-check-label" htmlFor={`rights-${index}`}>
+                                                    {right}
+                                                </label>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+
+                            ) : active.key === "contactDPO" || active.key === "grievanceOfficer" ? (
+                                <div className="row g-3">
+                                    {/* Name */}
+                                    <div className="col-md-6">
+                                        <label className="form-label small fw-semibold">Name</label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            placeholder="Enter name"
+                                            value={active.content?.split("|")[0] || ""}
+                                            onChange={(e) => {
+                                                const email = active.content?.split("|")[1] || "";
+                                                updateSection(active.key, {
+                                                    content: `${e.target.value}|${email}`,
+                                                });
+                                            }}
+                                        />
+                                    </div>
+
+                                    {/* Email */}
+                                    <div className="col-md-6">
+                                        <label className="form-label small fw-semibold">Email</label>
+                                        <input
+                                            type="email"
+                                            className="form-control"
+                                            placeholder="Enter email address"
+                                            value={active.content?.split("|")[1] || ""}
+                                            onChange={(e) => {
+                                                const name = active.content?.split("|")[0] || "";
+                                                updateSection(active.key, {
+                                                    content: `${name}|${e.target.value}`,
+                                                });
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                            ) : active.key === "retentionPeriod" ? (
+                                <div className="row g-3">
+                                    <div className="col-md-6">
+                                        <label className="form-label small fw-semibold">From Date</label>
+                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                            <DatePicker
+                                                value={
+                                                    active.content?.split("|")[0]
+                                                        ? dayjs(active.content.split("|")[0])
+                                                        : null
+                                                }
+                                                onChange={(newValue) => {
+                                                    const toDate = active.content?.split("|")[1] || "";
+                                                    const fromDate = newValue
+                                                        ? newValue.format("YYYY-MM-DD")
+                                                        : "";
+
+                                                    const duration = calculateMonths(fromDate, toDate);
+
+                                                    updateSection(active.key, {
+                                                        content: `${fromDate}|${toDate}|${duration}`,
+                                                    });
+                                                }}
+                                            />
+                                        </LocalizationProvider>
+                                    </div>
+
+                                    <div className="col-md-6">
+                                        <label className="form-label small fw-semibold">To Date</label>
+                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                            <DatePicker
+                                                value={
+                                                    active.content?.split("|")[1]
+                                                        ? dayjs(active.content.split("|")[1])
+                                                        : null
+                                                }
+                                                onChange={(newValue) => {
+                                                    const fromDate = active.content?.split("|")[0] || "";
+                                                    const toDate = newValue
+                                                        ? newValue.format("YYYY-MM-DD")
+                                                        : "";
+
+                                                    const duration = calculateMonths(fromDate, toDate);
+
+                                                    updateSection(active.key, {
+                                                        content: `${fromDate}|${toDate}|${duration}`,
+                                                    });
+                                                }}
+                                            />
+                                        </LocalizationProvider>
+                                    </div>
+
+                                    <div className="col-12">
+                                        <div className="p-2" style={{ background: "rgba(79,110,247,0.08)", borderRadius: 8 }}>
+                                            <strong>Retention Duration:</strong>{" "}
+                                            {active.content?.split("|")[2] || "—"}
+                                        </div>
+                                    </div>
+                                </div>
+
+                            ) : (
+                                <textarea
+                                    className="form-control"
+                                    rows={10}
+                                    value={active.content}
+                                    onChange={(e) =>
+                                        updateSection(active.key, { content: e.target.value })
+                                    }
+                                />
+                            )}
                             <div className="d-flex justify-content-between align-items-center mt-2">
                                 <span
                                     style={{ fontSize: 12, color: "var(--bs-secondary-color)" }}
