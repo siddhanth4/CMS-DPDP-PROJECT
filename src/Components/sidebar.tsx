@@ -180,6 +180,18 @@ const Sidebar: React.FC<Props> = ({ onClose, onNav }) => {
                             </>
                             
                         )}
+                        
+<NavLink
+    to="/admin/grievances"
+    className={({ isActive }) =>
+        `nav-link ${isActive ? "active" : ""}`
+    }
+    onClick={onNav}
+>
+    <i className="bi bi-exclamation-octagon me-2" />
+    Grievances
+</NavLink>
+
 
                         <button
                             className="btn btn-danger mt-2"

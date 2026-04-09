@@ -20,7 +20,7 @@ import AddAdmin from "../Admin/AddAdmin";
 import MyFormDetails from "../formbuilder/myFormDetail";
 import ConsentWithdrawRequest from "../formbuilder/consentWithdrawReport";
 import PrivacyNoticePage from "../Admin/PrivacyNoticePage";
-
+import GrievancesPage from "../Admin/GrievancesPage";
 
 
 const Layout: React.FC = () => {
@@ -127,6 +127,15 @@ const Layout: React.FC = () => {
                                     </ProtectedRoute>
                                 }
                             />
+
+                            <Route
+                                path="/admin/grievances"
+                                element={
+                                    <ProtectedRoute type="admin">
+                                        <GrievancesPage />
+                                    </ProtectedRoute>
+                                }
+                            />                          
 
                             {/* <Route
                                 path="/admin/userPermissions"
