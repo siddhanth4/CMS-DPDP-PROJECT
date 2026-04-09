@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { getNoticesList } from "../Api/noticeApi";
 import {
     DndContext,
     closestCenter,
@@ -104,6 +105,7 @@ type Meta = {
     category: string;
     title: string;
     subtitle: string;
+    noticeId: string;
 };
 
 /* ===================== HELPERS ===================== */
@@ -314,7 +316,40 @@ const FormBuilder: React.FC = () => {
         category: "Registration",
         title: "Event Sign-up",
         subtitle: "Collect attendee details with a branded UI.",
+        noticeId: "",
     });
+
+    const [noticeList, setNoticeList] = useState<any[]>([]); // To hold notices from DB
+
+// Update the fetch logic to safely handle non-array responses
+    useEffect(() => {
+        const fetchNotices = async () => {
+            try {
+                const response = await getNoticesList();
+                
+                let parsedData = [];
+                // Check if data is inside a 'data' property
+                if (response?.data) {
+                    parsedData = typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
+                } else if (Array.isArray(response)) {
+                    // Fallback in case the API returns the array directly
+                    parsedData = response;
+                }
+
+                // CRITICAL SAFETY CHECK: Ensure it is an array before setting it
+                if (Array.isArray(parsedData)) {
+                    setNoticeList(parsedData);
+                } else {
+                    console.warn("Notice API did not return a valid array:", parsedData);
+                    setNoticeList([]); // Default to empty array to prevent crash
+                }
+            } catch (err) {
+                console.error("Failed to load notices:", err);
+                setNoticeList([]); // Default to empty array on error
+            }
+        };
+        fetchNotices();
+    }, []);
 
     const [previewOpen, setPreviewOpen] = useState(false);
 
@@ -1113,6 +1148,25 @@ const FormBuilder: React.FC = () => {
                                         onChange={(e) => setMeta((p) => ({ ...p, subtitle: e.target.value }))}
                                         placeholder="Short description..."
                                     />
+
+                                    {/*  Safely render Privacy Notice Dropdown */}
+                                    <label className="form-label small text-secondary fw-semibold mt-4 text-primary">
+                                        <i className="bi bi-shield-check me-1"></i> Link Privacy Notice
+                                    </label>
+                                    <select
+                                        className="form-select"
+                                        style={{ borderColor: "rgba(79,110,247,0.4)" }}
+                                        value={meta.noticeId || ""}
+                                        onChange={(e) => setMeta((p) => ({ ...p, noticeId: e.target.value }))}
+                                    >
+                                        <option value="">-- No Notice Attached --</option>
+                                        {Array.isArray(noticeList) && noticeList.map((n) => (
+                                            <option key={n.id || Math.random()} value={n.id}>
+                                                {n.noticeName || `Notice #${n.id}`}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <div className="form-text small mt-1">Users must agree to this notice before viewing the form.</div>
                                 </div>
                             )}
 

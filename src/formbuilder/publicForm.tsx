@@ -4,6 +4,7 @@ import { useProject } from "../Context/projectContext";
 import { PopupAlert } from "../Components/alert";
 import { addFormResponseData } from "../Api/addFormResponse";
 import { sendOtpMail } from "../Api/sendMailOtp";
+import { getNoticeById } from "../Api/noticeApi"; // 👉 NEW import
 
 /* ================= TYPES ================= */
 type FieldType =
@@ -41,6 +42,7 @@ type Meta = {
     title?: string;
     subtitle?: string;
     category?: string;
+    noticeId?: string; // 👉 NEW: Added noticeId
 };
 
 /* ================= VALIDATION HELPERS ================= */
@@ -52,7 +54,6 @@ const isPasswordField = (f: BuilderField) => {
 const isPhoneField = (f: BuilderField) => {
     const text = `${f.id} ${f.label} ${f.placeholder ?? ""}`.toLowerCase();
 
-    // ✅ do not treat pincode as phone
     if (
         text.includes("pincode") ||
         text.includes("pin code") ||
@@ -98,18 +99,14 @@ const validateField = (f: BuilderField, value: any): string => {
         (Array.isArray(value) && value.length === 0) ||
         (typeof value === "boolean" && value === false && f.type === "terms");
 
-    // required validation
     if (f.required && isEmpty) {
         return getEmptyErrorMessage(f);
     }
 
-    // optional field empty => no further validation
     if (isEmpty) return "";
 
-    // string value
     const strValue = typeof value === "string" ? value.trim() : value;
 
-    // email format
     if (isEmailField(f) && typeof strValue === "string" && strValue !== "") {
         const regex = f.validation?.pattern
             ? new RegExp(f.validation.pattern)
@@ -120,7 +117,6 @@ const validateField = (f: BuilderField, value: any): string => {
         }
     }
 
-    // pincode validation
     if (isPincodeField(f) && typeof strValue === "string" && strValue !== "") {
         const onlyDigits = strValue.replace(/\D/g, "");
         if (!/^\d{6}$/.test(onlyDigits)) {
@@ -129,7 +125,6 @@ const validateField = (f: BuilderField, value: any): string => {
         return "";
     }
 
-    // mobile / phone validation
     if (isPhoneField(f) && typeof strValue === "string" && strValue !== "") {
         const onlyDigits = strValue.replace(/\D/g, "");
         if (!/^\d{10}$/.test(onlyDigits)) {
@@ -141,7 +136,6 @@ const validateField = (f: BuilderField, value: any): string => {
         return "";
     }
 
-    // password validation
     if (isPasswordField(f) && typeof strValue === "string" && strValue !== "") {
         const passwordRegex =
             /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&^#()_\-+={}[\]:;"'<>,./\\|`~]).{8,}$/;
@@ -155,7 +149,6 @@ const validateField = (f: BuilderField, value: any): string => {
         return "";
     }
 
-    // number validation
     if (f.type === "number" && strValue !== "") {
         const n = Number(strValue);
 
@@ -180,7 +173,6 @@ const validateField = (f: BuilderField, value: any): string => {
         return "";
     }
 
-    // generic min/max validation for text-like fields
     if (typeof strValue === "string") {
         const plainLength = strValue.length;
 
@@ -436,6 +428,11 @@ const PublicFormView: React.FC = () => {
     const [otpSending, setOtpSending] = useState(false);
     const year = useMemo(() => new Date().getFullYear(), []);
 
+    // 👉 NEW: Notice states
+    const [noticeHtml, setNoticeHtml] = useState<string>("");
+    const [noticeLoading, setNoticeLoading] = useState<boolean>(false);
+    const [hasAgreed, setHasAgreed] = useState<boolean>(false);
+
     useEffect(() => {
         if (!formId || Number.isNaN(formId)) return;
         fetchFormById(formId);
@@ -449,6 +446,23 @@ const PublicFormView: React.FC = () => {
 
     const fields: BuilderField[] = selectedForm?.FormData?.fields ?? [];
     const meta: Meta = selectedForm?.FormData?.meta ?? {};
+
+    // 👉 NEW: Check if form has a notice attached and fetch it
+    useEffect(() => {
+        if (meta.noticeId && !noticeHtml && !hasAgreed) {
+            setNoticeLoading(true);
+            getNoticeById(meta.noticeId)
+                .then(res => {
+                    const noticeData = typeof res.data === 'string' ? JSON.parse(res.data) : res.data;
+                    // Adjust key based on your Swagger object. Assuming `Notice` holds the HTML string
+                    setNoticeHtml(noticeData.Notice || noticeData.notice); 
+                })
+                .catch(err => console.error("Notice load error", err))
+                .finally(() => setNoticeLoading(false));
+        } else if (!meta.noticeId) {
+            setHasAgreed(true); // Skip directly to form if no notice linked
+        }
+    }, [meta.noticeId, noticeHtml, hasAgreed]);
 
     // init values when schema loaded
     useEffect(() => {
@@ -715,7 +729,61 @@ const PublicFormView: React.FC = () => {
         return (f.description ?? "").trim();
     };
 
-    /* ================= RENDER ================= */
+    /* ================= RENDER INTERCEPT: Notice Preview ================= */
+    // 👉 NEW: This prevents the form from loading until "I Agree" is clicked
+    if (meta.noticeId && !hasAgreed) {
+        return (
+            <div className="shell">
+                <div className="topbar mb-2 d-flex align-items-center justify-content-between">
+                    <div className="d-flex align-items-center gap-2">
+                        <div className="brand-badge">FF</div>
+                        <div className="lh-sm">
+                            <div className="fw-bold" style={{ fontSize: ".98rem" }}>NJ Softtech</div>
+                            <div className="text-secondary" style={{ fontSize: ".78rem" }}>Privacy Gateway</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="form-card card shadow-lg">
+                    <div className="card-header bg-primary bg-opacity-10 border-primary border-opacity-25">
+                        <div className="fw-bold text-primary">
+                            <i className="bi bi-shield-check me-2"></i> 
+                            Please Review the Privacy Notice
+                        </div>
+                    </div>
+                    <div className="card-body p-4">
+                        {noticeLoading ? (
+                            <div className="text-center text-secondary py-5">
+                                <div className="spinner-border spinner-border-sm me-2"></div> 
+                                Loading Privacy Notice...
+                            </div>
+                        ) : (
+                            <>
+                                {/* 👉 HTML Rendering block */}
+                                <div 
+                                    className="notice-container mb-4" 
+                                    style={{ maxHeight: '50vh', overflowY: 'auto', border: '1px solid var(--stroke)', padding: '20px', borderRadius: '8px', background: 'var(--bs-body-bg)' }}
+                                    dangerouslySetInnerHTML={{ __html: noticeHtml || "<p>Notice Content Unavailable</p>" }} 
+                                />
+                                
+                                <div className="d-flex justify-content-end border-top pt-3 mt-3">
+                                    <button 
+                                        className="btn btn-primary px-4 fw-bold" 
+                                        onClick={() => setHasAgreed(true)}
+                                    >
+                                        I Agree & Continue <i className="bi bi-arrow-right ms-2" />
+                                    </button>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+
+    /* ================= RENDER MAIN FORM ================= */
     return (
         <>
             <div className="shell">
